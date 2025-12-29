@@ -36,17 +36,29 @@ enum StudyYear {
 }
 
 model Student {
-  reg_number   String       @id
-  name         String
-  email        String       @unique
-  password     String
-  role         Role         @default(STUDENT)
-  program      StudyProgram
-  year         StudyYear
-  class_number String?
-  otp          String       @default("")
-  otp_expiry   DateTime?
-  isVerified   Boolean      @default(false)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  reg_number    String         @id
+  name          String
+  email         String         @unique
+  password      String
+  role          Role           @default(STUDENT)
+  program       StudyProgram
+  year          StudyYear
+  class_number  String?
+  otp           String         @default("")
+  otp_expiry    DateTime?
+  isVerified    Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  hashedToken String   @unique
+  expiresAt   DateTime
+  isRevoked   Boolean  @default(false)
+  createAt    DateTime @default(now())
+  updateAt    DateTime @updatedAt
+  student_id  String
+  student     Student  @relation(fields: [student_id], references: [reg_number], onDelete: Cascade)
 }
