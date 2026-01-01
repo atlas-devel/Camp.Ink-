@@ -1,0 +1,21 @@
+# backend 
+
+backend/node_modules
+backend/dist
+backend/.env
+backend/.env.local
+backend/.env.development
+backend/.env.test
+backend/.env.production
+backend/tsconfig.tsbuildinfo
+
+# frontend
+
+frontend/node_modules
+frontend/dist
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.test
+frontend/.env.production
+frontend/tsconfig.tsbuildinfo

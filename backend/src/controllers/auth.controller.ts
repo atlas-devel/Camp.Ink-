@@ -5,6 +5,7 @@ import { generateTokens } from "../utils/jwt";
 import prisma from "../utils/prisma";
 import env from "../utils/env";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 const setCookies = (
   res: Response,
@@ -36,7 +37,7 @@ export const login = async (
     return;
   }
   try {
-    const user: StudentData | null = await prisma.student.findUnique({
+    const user = await prisma.student.findUnique({
       where: { email },
     });
 
@@ -60,18 +61,65 @@ export const login = async (
     });
     setCookies(res, refreshToken, accessToken);
 
-    try {
-      const storeRefreshToken = await prisma.refreshToken.create({});
-    } catch (error) {
+    const hashRefreshToken: string = crypto
+      .createHash("sha256")
+      .update(refreshToken)
+      .digest("hex");
+
+    // store hashed refresh token in db
+    const store_hashed_refreshToken = await prisma.refreshToken.create({
+      data: {
+        hashedToken: hashRefreshToken,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        student_id: user.reg_number,
+      },
+    });
+    if (!store_hashed_refreshToken) {
       res
         .status(500)
-        .json({ success: false, message: "Internal server error", error });
+        .json({ success: false, message: "Internal Server Error" });
       return;
     }
+
+    res.status(200).json({ success: true, message: "Login successful" });
   } catch (error) {
     res
       .status(500)
       .json({ success: false, message: "Internal Server Error", error });
     return;
   }
+};
+
+export const logout = async (
+  req: Request,
+  res: Response<{ success: boolean; message: string }>
+): Promise<void> => {
+  const refreshToken: string = req.cookies.refreshToken;
+
+  if (refreshToken) {
+    const hashedRefreshToken: string = crypto
+      .createHash("sha256")
+      .update(refreshToken)
+      .digest("hex");
+
+    try {
+      await prisma.refreshToken.deleteMany({
+        where: { hashedToken: hashedRefreshToken },
+      });
+    } catch (error) {
+      console.error("Error at logout controller: ", error);
+    }
+  }
+
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: env.NODE_ENV === "development" ? "lax" : "none",
+  });
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: env.NODE_ENV === "development" ? "lax" : "none",
+  });
+  res.status(200).json({ success: true, message: "Logout successful" });
 };

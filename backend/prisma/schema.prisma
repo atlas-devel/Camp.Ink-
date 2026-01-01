@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
+
 }
 
 datasource db {
@@ -34,29 +34,30 @@ enum StudyYear {
   SECOND
   THIRD
 }
-enum Paper{
+
+enum Paper {
   BW
   COLOR
 }
 
-enum Status{
+enum Status {
   PENDING
   PRINTING
   COMPLETED
 }
 
-enum PaymentStatus{
+enum PaymentStatus {
   PENDING
   COMPLETED
   FAILED
 }
-enum PaymentMethod{
+
+enum PaymentMethod {
   CARD
   MOBILE_MONEY
   BANK_TRANSFER
   CASH
 }
-
 
 model Student {
   reg_number    String         @id
@@ -71,8 +72,11 @@ model Student {
   otp_expiry    DateTime?
   isVerified    Boolean        @default(false)
   createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  updatedAt     DateTime       @updatedAt @default(now())
   refreshTokens RefreshToken[]
+  classOrders   Class_orders[]
+  orders        Orders[]
+  payments      Payment[]
 }
 
 model RefreshToken {
@@ -85,61 +89,66 @@ model RefreshToken {
   student_id  String
   student     Student  @relation(fields: [student_id], references: [reg_number], onDelete: Cascade)
 }
-model Print_stuff{
-  id String @id @default(uuid())
-  email String
-  password String 
-  school String
-  otp String
-  otp_expiry String 
-  isVerified Boolean
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+
+model Print_stuff {
+  id          String         @id @default(uuid())
+  email       String
+  password    String
+  school      String
+  otp         String
+  otp_expiry  String
+  isVerified  Boolean
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+  classOrders Class_orders[]
+  orders      Orders[]
 }
 
-model Class_orders{
-  id String @id @default(uiid())
-  price Int
-  copies Int
-  file_url String
-  file_name String
-  paper_type Paper @default(BW)
-  status Status @default(PENDING)
-  student_id String
-  student Student @relation(fields: [student_id],references: [reg_number], onDelete: Cascade)
-  print_id String
+model Class_orders {
+  id          String      @id @default(uuid())
+  price       Int
+  copies      Int
+  file_url    String
+  file_name   String
+  paper_type  Paper       @default(BW)
+  status      Status      @default(PENDING)
+  student_id  String
+  student     Student     @relation(fields: [student_id], references: [reg_number], onDelete: Cascade)
+  print_id    String
   print_stuff Print_stuff @relation(fields: [print_id], references: [id], onDelete: Cascade)
-  order_date DateTime @default(now())
-  updated_at DateTime @updatedAt
+  order_date  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+  payments    Payment[]
 }
 
-model Orders{
-  id String @id @default(uuid())
-  price Int
-  copies Int
-  file_url String
-  file_name String
-  paper_type Paper @default(BW)
-  status Status @default(PENDING)
-  student_id String
-  student Student @relation(fields: [student_id],references: [reg_number], onDelete: Cascade)
-  print_id String
+model Orders {
+  id          String      @id @default(uuid())
+  price       Int
+  copies      Int
+  file_url    String
+  file_name   String
+  paper_type  Paper       @default(BW)
+  status      Status      @default(PENDING)
+  student_id  String
+  student     Student     @relation(fields: [student_id], references: [reg_number], onDelete: Cascade)
+  print_id    String
   print_stuff Print_stuff @relation(fields: [print_id], references: [id], onDelete: Cascade)
-  order_date DateTime @default(now())
-  updated_at DateTime @updatedAt
+  order_date  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+  payments    Payment[]
 }
 
-model Payment{
-  id String @id @default(uuid())
-  student_id String
-  student Student @relation(fields: [student_id], references: [reg_number], onDelete: Cascade)
-  order_id String
-  order Orders @relation(fields: [order_id], references: [id])
+model Payment {
+  id             String        @id @default(uuid())
+  student_id     String
+  student        Student       @relation(fields: [student_id], references: [reg_number], onDelete: Cascade)
+  order_id       String
+  order          Orders        @relation(fields: [order_id], references: [id])
   class_order_id String?
-  class_order Class_orders? @relation(fields: [class_order_id], references: [id])
-  amount Int
+  class_order    Class_orders? @relation(fields: [class_order_id], references: [id])
+  amount         Int
   payment_method PaymentMethod
   payment_status PaymentStatus @default(PENDING)
-  payment_date DateTime @default(now())
-  updated_at DateTime @updatedAt
+  payment_date   DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
 }
