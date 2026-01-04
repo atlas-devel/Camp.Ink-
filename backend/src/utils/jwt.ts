@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import env from "./env";
+import { constants } from "zlib";
 
 export const generateTokens = (payload: {
   id: string;
@@ -12,4 +13,10 @@ export const generateTokens = (payload: {
     expiresIn: "7d",
   });
   return { accessToken, refreshToken };
+};
+export const generateTempToken = (payload: { id: string; purpose: string }) => {
+  const tempToken = jwt.sign(payload, env.TEMP_TOKEN_SECRET, {
+    expiresIn: "10m",
+  });
+  return { tempToken };
 };

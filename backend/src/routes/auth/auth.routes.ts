@@ -1,4 +1,4 @@
-import { login, logout } from "./../controllers/auth.controller";
+import { login, logout } from "../../controllers/auth.controller";
 import type { Router } from "express";
 import express from "express";
 

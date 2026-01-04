@@ -7,5 +7,6 @@ const env: EnvTypes = {
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET!,
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET!,
   NODE_ENV: process.env.NODE_ENV!,
+  TEMP_TOKEN_SECRET: process.env.TEMP_TOKEN_SECRET!,
 };
 export default env;

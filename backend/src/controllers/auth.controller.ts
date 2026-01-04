@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import type { LoginCredentials } from "../utils/types";
-import type { StudentData } from "../utils/types";
-import { generateTokens } from "../utils/jwt";
+import { generateTempToken, generateTokens } from "../utils/jwt";
 import prisma from "../utils/prisma";
 import env from "../utils/env";
 import bcrypt from "bcryptjs";
@@ -48,7 +47,31 @@ export const login = async (
 
     // redirect to verification page in frontend
     if (!user.isVerified) {
-      res.status(403).json({ success: false, message: "User not verified" });
+      const matchingPassword = await bcrypt.compare(password, user.password);
+      if (!matchingPassword) {
+        res
+          .status(401)
+          .json({ success: false, message: "Invalid Default password" });
+        return;
+      }
+
+      const { tempToken } = generateTempToken({
+        id: user?.reg_number,
+        purpose: "RESET_PASSWORD",
+      });
+
+      res.cookie("RESET_PASSWORD_TOKEN", tempToken, {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: env.NODE_ENV === "development" ? "lax" : "none",
+        maxAge: 10 * 60 * 1000,
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "user is not verified. Redirecting to verification page.",
+      });
+
       return;
     }
     const decyptPassword = await bcrypt.compare(password, user.password);

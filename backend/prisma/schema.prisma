@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-
 }
 
 datasource db {
@@ -16,7 +15,7 @@ datasource db {
 
 enum Role {
   STUDENT
-  ADMIN
+  CLASS_LEADER
 }
 
 enum StudyProgram {
@@ -72,7 +71,7 @@ model Student {
   otp_expiry    DateTime?
   isVerified    Boolean        @default(false)
   createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt @default(now())
+  updatedAt     DateTime       @default(now()) @updatedAt
   refreshTokens RefreshToken[]
   classOrders   Class_orders[]
   orders        Orders[]
@@ -92,12 +91,14 @@ model RefreshToken {
 
 model Print_stuff {
   id          String         @id @default(uuid())
-  email       String
+  name        String
+  telephone   String
+  email       String         @unique
   password    String
   school      String
-  otp         String
-  otp_expiry  String
-  isVerified  Boolean
+  otp         String         @default("")
+  otp_expiry  String?
+  isVerified  Boolean        @default(false)
   created_at  DateTime       @default(now())
   updated_at  DateTime       @updatedAt
   classOrders Class_orders[]
