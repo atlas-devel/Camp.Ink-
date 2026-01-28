@@ -16,6 +16,7 @@ datasource db {
 enum Role {
   STUDENT
   CLASS_LEADER
+  PRINT_STUFF
 }
 
 enum StudyProgram {
