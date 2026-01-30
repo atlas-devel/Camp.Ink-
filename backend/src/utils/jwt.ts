@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import env from "./env";
-import { constants } from "zlib";
 
 export const generateTokens = (payload: {
   id: string;

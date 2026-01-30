@@ -8,5 +8,8 @@ const env: EnvTypes = {
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET!,
   NODE_ENV: process.env.NODE_ENV!,
   TEMP_TOKEN_SECRET: process.env.TEMP_TOKEN_SECRET!,
+  EMAIL_USER: process.env.EMAIL_USER!,
+  EMAIL_PASS: process.env.EMAIL_PASS!,
+  RESEND_API_KEY: process.env.RESEND_API_KEY!,
 };
 export default env;

@@ -6,6 +6,9 @@ export type EnvTypes = {
   REFRESH_TOKEN_SECRET: string;
   NODE_ENV: string;
   TEMP_TOKEN_SECRET: string;
+  EMAIL_USER: string;
+  EMAIL_PASS: string;
+  RESEND_API_KEY: string;
 };
 
 export type LoginCredentials = {
